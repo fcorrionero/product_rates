@@ -37,3 +37,6 @@ curl --location --request GET 'http://localhost:8080/rate?application_date=2020-
 curl --location --request GET 'http://localhost:8080/rate?application_date=2020-06-15%2010:00:00&product_id=35455&brand_id=1'
 curl --location --request GET 'http://localhost:8080/rate?application_date=2020-06-16%2021:00:00&product_id=35455&brand_id=1'
 ```
+
+Para los test unitarios he optado por crear los mocks usando las funciones que provee la librería Mockito en lugar de hacerlo
+con sus anotaciones @Mock porque los tiempos de ejecución de los test se reducen significativamente (un orden de magnitud en ms)
