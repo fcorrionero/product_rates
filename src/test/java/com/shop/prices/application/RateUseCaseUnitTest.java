@@ -18,18 +18,18 @@ import java.util.Optional;
 import static org.mockito.Mockito.times;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class RateServiceUnitTest {
+public class RateUseCaseUnitTest {
 
     private final RateRepository rateRepository = Mockito.mock(RateRepository.class);
 
     private final SimpleDateFormat simpleDateFormat = new DateConfig().dateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private RateService rateService;
+    private RateUseCase rateUseCase;
 
     @BeforeEach
     public void beforeEach() {
         Mockito.reset(rateRepository);
-        rateService = new RateService(rateRepository, simpleDateFormat);
+        rateUseCase = new RateUseCase(rateRepository, simpleDateFormat);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class RateServiceUnitTest {
                     simpleDateFormat.parse(givenGetRateRequestDto.applicationDate())))
             .thenReturn(Optional.of(givenRate));
 
-        RateResponseDto rateResponseDto = rateService.getRateByDate(givenGetRateRequestDto);
+        RateResponseDto rateResponseDto = rateUseCase.getRateByDate(givenGetRateRequestDto);
 
         RateResponseDto expectedRateResponseDto = RateResponseDto.createFromRate(givenRate, simpleDateFormat);
         Assertions.assertEquals(expectedRateResponseDto, rateResponseDto);
@@ -70,7 +70,7 @@ public class RateServiceUnitTest {
 
         Assertions.assertThrows(
             DomainEntityNotFoundException.class,
-            () -> rateService.getRateByDate(givenGetRateRequestDto)
+            () -> rateUseCase.getRateByDate(givenGetRateRequestDto)
         );
         Mockito.verify(rateRepository, times(1))
             .findRateByProductIdAndBrandIdAndApplicationDate(

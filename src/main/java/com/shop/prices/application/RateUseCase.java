@@ -14,11 +14,11 @@ import java.util.Date;
 import java.util.Optional;
 
 @Service
-public class RateService {
+public class RateUseCase {
     private final RateRepository rateRepository;
     private final SimpleDateFormat dateFormat;
 
-    public RateService(
+    public RateUseCase(
         @Autowired RateRepository rateRepository,
         @Autowired SimpleDateFormat dateFormat
     ) {

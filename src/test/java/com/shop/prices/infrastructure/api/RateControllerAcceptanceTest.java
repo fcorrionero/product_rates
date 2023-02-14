@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -88,7 +89,7 @@ public class RateControllerAcceptanceTest {
             .expectBody(RateResponseDto.class)
             .returnResult();
 
-        Assertions.assertNull(response.getResponseBody());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
     }
 
     @Test
@@ -110,7 +111,7 @@ public class RateControllerAcceptanceTest {
             .expectBody(RateResponseDto.class)
             .returnResult();
 
-        Assertions.assertNull(response.getResponseBody());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatus());
     }
 
     @Test
