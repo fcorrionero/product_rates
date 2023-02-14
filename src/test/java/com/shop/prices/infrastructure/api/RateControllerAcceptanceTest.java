@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +20,7 @@ import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @SpringBootTest(
     classes = PricesApplication.class,
@@ -38,12 +42,34 @@ public class RateControllerAcceptanceTest {
         Objects.requireNonNull(cacheManager.getCache(CaffeineConfiguration.MAIN_CACHE_NAME)).clear();
     }
 
-    @Test
-    public void should_return_a_RateResponse() {
-        String givenProductId = "35455";
-        String givenBrandId = "1";
-        String givenApplicationDate = "2020-06-15 00:00:00";
+    private static Stream<Arguments> acceptanceTestArguments() {
+        return Stream.of(
+            Arguments.of(35455, 1, "2020-06-14 10:00:00", new RateResponseDto(
+                35455, 1, 1, "2020-06-14 00:00:00", "2020-12-31 23:59:59", 35.5, "EUR"
+            )),
+            Arguments.of(35455, 1, "2020-06-14 16:00:00", new RateResponseDto(
+                35455, 1, 2, "2020-06-14 15:00:00", "2020-06-14 18:30:00", 25.45, "EUR"
+            )),
+            Arguments.of(35455, 1, "2020-06-14 21:00:00", new RateResponseDto(
+                35455, 1, 1, "2020-06-14 00:00:00", "2020-12-31 23:59:59", 35.5, "EUR"
+            )),
+            Arguments.of(35455, 1, "2020-06-15 10:00:00", new RateResponseDto(
+                35455, 1, 3, "2020-06-15 00:00:00", "2020-06-15 11:00:00", 30.5, "EUR"
+            )),
+            Arguments.of(35455, 1, "2020-06-16 21:00:00", new RateResponseDto(
+                35455, 1, 4, "2020-06-15 16:00:00", "2020-12-31 23:59:59", 38.95, "EUR"
+            ))
+        );
+    }
 
+    @ParameterizedTest
+    @MethodSource("acceptanceTestArguments")
+    public void should_return_a_RateResponse(
+        long givenProductId,
+        long givenBrandId,
+        String givenApplicationDate,
+        RateResponseDto expectedResponse
+    ) {
         EntityExchangeResult<RateResponseDto> response = webTestClient.get()
             .uri(
                 String.format("/rate?product_id=%s&brand_id=%s&application_date=%s",
@@ -56,16 +82,6 @@ public class RateControllerAcceptanceTest {
             .expectStatus().is2xxSuccessful()
             .expectBody(RateResponseDto.class)
             .returnResult();
-
-        RateResponseDto expectedResponse = new RateResponseDto(
-            35455,
-            1,
-            3,
-            "2020-06-15 00:00:00",
-            "2020-06-15 11:00:00",
-            30.50,
-            "EUR"
-        );
 
         Assertions.assertEquals(expectedResponse, response.getResponseBody());
     }
