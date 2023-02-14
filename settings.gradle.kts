@@ -1,1 +1,1 @@
-rootProject.name = "prices"
+rootProject.name = "product_rates"
