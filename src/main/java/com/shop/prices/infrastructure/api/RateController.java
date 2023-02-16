@@ -3,7 +3,6 @@ package com.shop.prices.infrastructure.api;
 import com.shop.prices.application.GetRateRequestDto;
 import com.shop.prices.application.RateResponseDto;
 import com.shop.prices.application.RateUseCase;
-import com.shop.prices.domain.exception.DomainEntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,7 +29,7 @@ public class RateController {
         @RequestParam("product_id") long productId,
         @RequestParam("brand_id") long brandId,
         @RequestParam("application_date") String applicationDate
-    ) throws ParseException, DomainEntityNotFoundException {
+    ) throws ParseException {
         return ResponseEntity.ok().body(
             rateUseCase.getRateByDate(new GetRateRequestDto(productId, brandId, applicationDate))
         );

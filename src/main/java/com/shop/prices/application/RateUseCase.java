@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 public class RateUseCase {
@@ -29,12 +28,10 @@ public class RateUseCase {
     @Cacheable(value= CaffeineConfiguration.MAIN_CACHE_NAME, key="#rateRequestDto.productId()+'/'+#rateRequestDto.brandId()+'/'+#rateRequestDto.applicationDate()")
     public RateResponseDto getRateByDate(GetRateRequestDto rateRequestDto) throws ParseException, DomainEntityNotFoundException {
         Date applicationDate = dateFormat.parse(rateRequestDto.applicationDate());
-        Optional<Rate> rate = rateRepository.findRateByProductIdAndBrandIdAndApplicationDate(rateRequestDto.productId(), rateRequestDto.brandId(), applicationDate);
-        if (rate.isPresent()) {
-            return RateResponseDto.createFromRate(rate.get(), dateFormat);
-        }
-
-        throw new DomainEntityNotFoundException("Rate not found");
+        Rate rate = rateRepository
+            .findRateByProductIdAndBrandIdAndApplicationDate(rateRequestDto.productId(), rateRequestDto.brandId(), applicationDate)
+            .orElseThrow(() -> new DomainEntityNotFoundException("Rate not found"));
+        return RateResponseDto.createFromRate(rate, dateFormat);
     }
 
 }
